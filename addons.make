@@ -1,0 +1,6 @@
+ofxOpenCv
+ofxCv
+ofxGui
+ofxHomography
+ofxOsc
+ofxXmlSettings
