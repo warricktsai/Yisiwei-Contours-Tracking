@@ -5,10 +5,10 @@
 #include "ofxHomography.h"
 #include "LineEquation.h"
 
-//#define USE_LIVE_CAM        // uncomment this to use a live camera
+#define USE_LIVE_CAM        // uncomment this to use a live camera
                                 // otherwise, we'll use a movie file
 
-#define LIVE_CAM_MAX 2
+#define LIVE_CAM_MAX 4
 
 #include "ofxOsc.h"
 
@@ -38,7 +38,7 @@ public:
 	float threshold;
     
     #ifdef USE_LIVE_CAM
-        ofVideoGrabber  cam[2];
+        ofVideoGrabber  cam[LIVE_CAM_MAX];
     #else
         ofVideoPlayer   movie;
     #endif
@@ -58,7 +58,7 @@ public:
     int Gy = 0;
     ofPoint lastGxy;
     float distance = 0;
-    int vertexDistance = 200; // 130, 200
+    int vertexDistance = 130; // 130, 200
     
     LineEquation line;
     

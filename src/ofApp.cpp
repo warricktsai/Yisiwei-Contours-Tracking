@@ -5,7 +5,7 @@ using namespace cv;
 
 void ofApp::setup() {
     ofSetWindowTitle("yisiwei Tracking System");
-    ofSetFrameRate(30);
+    ofSetFrameRate(60);
     ofSetVerticalSync(true);
 	ofBackground(0);
     
@@ -14,21 +14,21 @@ void ofApp::setup() {
 
     w = 640;
     h = 480;
-    camFix_X = -88;
-    camFix_Y = -1;
+    camFix_X = -91;   //-127
+    camFix_Y = -20;   // -31
     
 #ifdef USE_LIVE_CAM
-    ofSetWindowShape(960+camFix_X, 640+camFix_Y);
+    ofSetWindowShape(w*2+camFix_X, h*2+camFix_Y);
     
     cam[0].listDevices();
     
-    int camIdList[LIVE_CAM_MAX] = {2, 3};
+    int camIdList[LIVE_CAM_MAX] = {0, 2, 3, 4};
     
     for (int i=0; i<LIVE_CAM_MAX; i++) {
         cam[i].setDeviceID(camIdList[i]);
         cam[i].setVerbose(true);
         cam[i].setup(w,h);
-        cam[i].setDesiredFrameRate(30);
+        cam[i].setDesiredFrameRate(60);
     }
 #else
     movie.load("12points.mov");
@@ -48,20 +48,20 @@ void ofApp::setup() {
 	showLabels = true;
     showPos = true;
     
-//    originalCorners[0].set(15, 15);
-//    originalCorners[1].set(835, 16);
-//    originalCorners[2].set(842, 617);
-//    originalCorners[3].set(23, 613);
+//    originalCorners[0].set(11, 11);
+//    originalCorners[1].set(852, 5);
+//    originalCorners[2].set(860, 611);
+//    originalCorners[3].set(11, 615);
     
-    originalCorners[0].set(11, 11);
-    originalCorners[1].set(852, 5);
-    originalCorners[2].set(860, 611);
-    originalCorners[3].set(11, 615);
+    originalCorners[0].set(27, 40);
+    originalCorners[1].set(1156, 25);
+    originalCorners[2].set(1160, 892);
+    originalCorners[3].set(23, 884);
     
     distortedCorners[0].set(0, 0);
-    distortedCorners[1].set(960+camFix_X, 0);
-    distortedCorners[2].set(960+camFix_X, 640+camFix_Y);
-    distortedCorners[3].set(0, 640+camFix_Y);
+    distortedCorners[1].set(w*2+camFix_X, 0);
+    distortedCorners[2].set(w*2+camFix_X, h*2+camFix_Y);
+    distortedCorners[3].set(0, h*2+camFix_Y);
 }
 
 void ofApp::update() {
@@ -81,7 +81,8 @@ void ofApp::update() {
     
     if (bNewFrame[0] && bNewFrame[1]){
 #ifdef USE_LIVE_CAM
-        fbo.allocate(h*4,w, GL_RGBA);
+//        fbo.allocate(h*4,w, GL_RGBA);
+        fbo.allocate(w*2,h*2, GL_RGBA);
         
         fbo.begin();
             ofSetColor(100,100,100);
@@ -91,18 +92,32 @@ void ofApp::update() {
         
             ofSetColor(255,255,255);
         
+            
             ofPixels c1 = cam[0].getPixels();
             ofPixels c2 = cam[1].getPixels();
+            ofPixels c3 = cam[2].getPixels();
+            ofPixels c4 = cam[3].getPixels();
                         
-            c1.rotate90(-1);
-            c2.rotate90(-1);
+//            c1.rotate90(1);
+//            c2.rotate90(-1);
+//            c1.mirror(1, 1);
+//            c2.mirror(1, 1);
+//            c3.mirror(1, 1);
+//            c4.mirror(1, 1);
         
-            ofImage cam1, cam2;
+            ofImage cam1, cam2, cam3, cam4;
             cam1.setFromPixels(c1);
             cam2.setFromPixels(c2);
+            cam3.setFromPixels(c3);
+            cam4.setFromPixels(c4);
             
             cam1.draw(0, 0);
-            cam2.draw(h+camFix_X, camFix_Y);
+            cam2.draw(w+camFix_X, 0);
+            cam3.draw(0, h+camFix_Y);
+            cam4.draw(w+camFix_X, h+camFix_Y);
+            
+        
+//            cam2.draw(0, h+camFix_Y);
         
         fbo.end();
         
@@ -134,7 +149,7 @@ void ofApp::draw() {
             movie.draw(0, 0);
         #endif
         
-        contourFinder.draw();
+//        contourFinder.draw();
         
         string msgPos = "";
         xyPosOsc.clear();
@@ -157,7 +172,7 @@ void ofApp::draw() {
             
             ofVec2f velocity = toOf(contourFinder.getVelocity(i));
             ofScale(5, 5);
-            ofDrawLine(0, 0, velocity.x, velocity.y);
+//            ofDrawLine(0, 0, velocity.x, velocity.y);
             ofPopMatrix();
         }
 
@@ -237,10 +252,11 @@ void ofApp::draw() {
                     ofPoint cross = line.GetCrossPoint(line.GetLine(p1, p2), line.GetLine(p3, p4));
                     vertexPoint.push_back(cross);
                     
-                    // 移除相近點
-                    if(vertexPoint.size() > 1 && abs(vertexPoint.back().x-vertexPoint.at(vertexPoint.size()-2).x)<15 && abs(vertexPoint.back().y-vertexPoint.at(vertexPoint.size()-2).y)<15){
+                    // 移除相近點    10, 15
+                    if(vertexPoint.size() > 1 && abs(vertexPoint.back().x -vertexPoint.at(vertexPoint.size()-2).x)<10 && abs(vertexPoint.back().y-vertexPoint.at(vertexPoint.size()-2).y)<10){
                         vertexPoint.pop_back();
-                    }else if(vertexPoint.size() > 1  && abs(vertexPoint.back().x-vertexPoint.at(0).x)<15 && abs(vertexPoint.back().y-vertexPoint.at(0).y)<15){
+                    }
+                    else if(vertexPoint.size() > 1  && abs(vertexPoint.back().x-vertexPoint.at(0).x)<10 && abs(vertexPoint.back().y-vertexPoint.at(0).y)<10){
                         vertexPoint.pop_back();
                     }
                     
@@ -297,7 +313,7 @@ void ofApp::draw() {
             for(int i=0;i<vertexPoint.size();i++){
 //                cout << "vertexPoint: " << vertexPoint.at(i) << endl;
                 string pos = ofToString(vertexPoint.at(i));
-                ofDrawBitmapString(pos, vertexPoint.at(i).x+13, vertexPoint.at(i).y);
+//                ofDrawBitmapString(pos, vertexPoint.at(i).x+13, vertexPoint.at(i).y);
             }
             
             if(vertexPoint.size()==4){
@@ -320,10 +336,10 @@ void ofApp::draw() {
                 
                 // Draw a point in the warped space
                 ofSetColor(255, 0, 255);
-                ofDrawCircle(p1, 7);
-                ofDrawCircle(p2, 7);
-                ofDrawCircle(p3, 7);
-                ofDrawCircle(p4, 7);
+//                ofDrawCircle(p1, 7);
+//                ofDrawCircle(p2, 7);
+//                ofDrawCircle(p3, 7);
+//                ofDrawCircle(p4, 7);
                 
                 ofPopMatrix();
                 
@@ -364,7 +380,7 @@ void ofApp::draw() {
                                 + ofToString(sP2.x) + "," + ofToString(sP2.y) + "\n"
                                 + ofToString(sP3.x) + "," + ofToString(sP3.y) + "\n"
                                 + ofToString(sP4.x) + "," + ofToString(sP4.y);
-                ofDrawBitmapString(points, 20, ofGetHeight()-140);
+//                ofDrawBitmapString(points, 20, ofGetHeight()-140);
                 
 //                cout << sP1 << ", " << sP2 << ", " << sP3 << ", " << sP4 << endl;
             }
@@ -421,9 +437,9 @@ void ofApp::draw() {
 		}
 	}
 
-    ofDrawBitmapString(ofGetFrameRate(), 20, 20);
+//    ofDrawBitmapString(ofGetFrameRate(), 20, 20);
     string widowsSize = "Cam Size: " + ofToString(ofGetWidth())  + ", " + ofToString(ofGetHeight());
-    ofDrawBitmapString(widowsSize, 20, ofGetHeight()-50);
+//    ofDrawBitmapString(widowsSize, 20, ofGetHeight()-20);
 }
 
 void ofApp::mousePressed(int x, int y, int button) {
@@ -467,7 +483,7 @@ void ofApp::keyPressed(int key) {
     
     
 #ifdef USE_LIVE_CAM
-    ofSetWindowShape(960+camFix_X, 640+camFix_Y);
+    ofSetWindowShape(w*2+camFix_X, h*2+camFix_Y);
 #else
         
 #endif
@@ -482,7 +498,7 @@ void ofApp::keyPressed(int key) {
         if(oCornerIndex>=4){
             oCornerIndex = 0;
         }
-        cout << mouseX << ", " << mouseY << endl;
+        cout << oCornerIndex << ": " << mouseX << ", " << mouseY << endl;
     }
     
     if(key == 'd'){
