@@ -53,10 +53,10 @@ void ofApp::setup() {
 //    originalCorners[2].set(860, 611);
 //    originalCorners[3].set(11, 615);
     
-    originalCorners[0].set(27, 40);
-    originalCorners[1].set(1156, 25);
-    originalCorners[2].set(1160, 892);
-    originalCorners[3].set(23, 884);
+    originalCorners[0].set(27+fixP1.x, 40+fixP1.y);
+    originalCorners[1].set(1156+fixP2.x, 25+fixP2.y);
+    originalCorners[2].set(1160+fixP3.x, 892+fixP3.y);
+    originalCorners[3].set(23+fixP4.x, 884+fixP4.y);
     
     distortedCorners[0].set(0, 0);
     distortedCorners[1].set(w*2+camFix_X, 0);
@@ -336,10 +336,10 @@ void ofApp::draw() {
                 
                 // Draw a point in the warped space
                 ofSetColor(255, 0, 255);
-//                ofDrawCircle(p1, 7);
-//                ofDrawCircle(p2, 7);
-//                ofDrawCircle(p3, 7);
-//                ofDrawCircle(p4, 7);
+                ofDrawCircle(p1, 7);
+                ofDrawCircle(p2, 7);
+                ofDrawCircle(p3, 7);
+                ofDrawCircle(p4, 7);
                 
                 ofPopMatrix();
                 
@@ -480,7 +480,38 @@ void ofApp::keyPressed(int key) {
         camFix_Y ++;
     }
     
+    if(key == 't') {
+        fixP1.x ++;
+    }
+    if(key == 'g') {
+        fixP1.y ++;
+    }
     
+    if(key == 'y') {
+        fixP2.x ++;
+    }
+    if(key == 'h') {
+        fixP2.y ++;
+    }
+
+    if(key == 'u') {
+        fixP3.x ++;
+    }
+    if(key == 'j') {
+        fixP3.y ++;
+    }
+    
+    if(key == 'i') {
+        fixP4.x ++;
+    }
+    if(key == 'k') {
+        fixP4.y ++;
+    }
+    
+    originalCorners[0].set(27+fixP1.x, 40+fixP1.y);
+    originalCorners[1].set(1156+fixP2.x, 25+fixP2.y);
+    originalCorners[2].set(1160+fixP3.x, 892+fixP3.y);
+    originalCorners[3].set(23+fixP4.x, 884+fixP4.y);
     
 #ifdef USE_LIVE_CAM
     ofSetWindowShape(w*2+camFix_X, h*2+camFix_Y);

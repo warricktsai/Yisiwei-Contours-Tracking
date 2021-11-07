@@ -5,7 +5,7 @@
 #include "ofxHomography.h"
 #include "LineEquation.h"
 
-#define USE_LIVE_CAM        // uncomment this to use a live camera
+//#define USE_LIVE_CAM        // uncomment this to use a live camera
                                 // otherwise, we'll use a movie file
 
 #define LIVE_CAM_MAX 4
@@ -71,4 +71,10 @@ public:
     int oCornerIndex = 0;
     int dCornerIndex = 0;
     ofMatrix4x4 homography;
+    
+    
+    ofPoint fixP1 = ofVec3f(0, 0, 0);
+    ofPoint fixP2 = ofVec3f(0, 0, 0);
+    ofPoint fixP3 = ofVec3f(0, 0, 0);
+    ofPoint fixP4 = ofVec3f(0, 0, 0);
 };
